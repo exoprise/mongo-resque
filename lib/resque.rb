@@ -17,7 +17,7 @@ module Resque
   include Helpers
   extend self
   @delayed_queues = []
-  
+
   # Set the queue database. Expects a Moped::Session object with a default database.
   def mongo=(database)
     if database.is_a?(Moped::Session)
@@ -124,7 +124,7 @@ module Resque
       mongo_stats.find(stat: 'Delayed Queues').upsert('$addToSet' => {'value' => queue})
     end
   end
-  
+
   # If 'inline' is true Resque will call #perform method inline
   # without queuing it into Redis and without any Resque callbacks.
   # The 'inline' is false Resque jobs will be put in queue regularly.
@@ -235,7 +235,7 @@ module Resque
   end
 
   # Returns an array of all known Resque queues as strings.
-  def queues        
+  def queues
     mongo.collection_names.
       select { |name| name =~ /resque\.queues\./ }.
       collect { |name| name.split(".")[2..-1].join('.') }
@@ -301,9 +301,9 @@ module Resque
 
     return true
   end
-  
+
   def enqueue_delayed(klass, *args)
-    
+
   end
 
   # This method can be used to conveniently remove a job from a queue.
