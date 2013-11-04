@@ -42,7 +42,7 @@ context "Resque::Worker" do
     def self.on_failure_record_failure(exception, *job_args)
       @@exception = exception
     end
-    
+
     def self.exception
       @@exception
     end
@@ -318,7 +318,10 @@ context "Resque::Worker" do
   end
 
   test "worker_pids returns pids" do
-    known_workers = @worker.worker_pids
+    known_workers = []
+    @worker.work(0) do
+      known_workers = @worker.worker_pids
+    end
     assert !known_workers.empty?
   end
 
