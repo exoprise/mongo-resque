@@ -104,7 +104,7 @@ module Resque
 
   def to_s
     mongo.cluster.with_primary do |node|
-      "Resque Client connected to #{node.resolved_address}/#{mongo.options[:database]}"
+      "Resque Client connected to #{node.address.resolved}/#{mongo.options[:database]}"
     end
   end
 

@@ -16,11 +16,10 @@ Gem::Specification.new do |s|
     without the work of defunkt and ctrochalakis on github.
 description
 
-  s.add_dependency "moped",      "~> 1.3"
-  s.add_dependency "vegas",      "~> 0.1.2"
+  s.add_dependency "moped",      ">= 2.0.beta3"
   s.add_dependency "sinatra",    ">= 0.9.2"
   s.add_dependency "multi_json", "~> 1.0"
-  
+
   s.files = Dir["lib/**/*"] + Dir["bin/*"] + Dir["docs/*"] + %w(README.markdown LICENSE HISTORY.md)
   s.executables = %w(resque resque-web)
   s.extra_rdoc_files = %w(LICENSE README.markdown)
