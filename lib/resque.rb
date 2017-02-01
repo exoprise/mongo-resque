@@ -224,7 +224,8 @@ module Resque
   # and converting them into Ruby objects.
   def list_range(key, start = 0, count = 1, mode = :ready)
     query = { }
-    sort = []
+    #sort = []
+    sort = {}
     if delayed_queue? key
       if mode == :ready
         query['delay_until'] = { '$not' => { '$gt' => Time.new}}
@@ -232,10 +233,12 @@ module Resque
         query['delay_until'] = { '$gt' => Time.new}
       elsif mode == :delayed_sorted
         query['delay_until'] = { '$gt' => Time.new}
-        sort << ['delay_until', 1]
+        #sort << ['delay_until', 1]
+        sort = {delay_until: 1}
       elsif mode == :all_sorted
         query = {}
-        sort << ['delay_until', 1]
+        #sort << ['delay_until', 1]
+        sort = {delay_until: 1}
       end
     end
     queue = namespace_queue(key)

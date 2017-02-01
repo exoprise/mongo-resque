@@ -22,7 +22,8 @@ module Resque
       end
 
       def self.all(start = 0, count = 1)
-        all_failures = Resque.mongo_failures.find().sort([:natural, :desc]).skip(start).limit(count).to_a
+        #all_failures = Resque.mongo_failures.find().sort([:natural, :desc]).skip(start).limit(count).to_a
+        all_failures = Resque.mongo_failures.find().sort(natural: -1).skip(start).limit(count).to_a
        # all_failures.size == 1 ? all_failures.first : all_failures        
       end
 
