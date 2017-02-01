@@ -175,7 +175,8 @@ module Resque
     query = {}
     query['delay_until'] = { '$lt' => Time.now } if delayed_queue?(queue)
     #sorting will result in significant performance penalties for large queues, you have been warned.
-    item = mongo[queue].find_and_modify(:query => query, :remove => true, :sort => [[:_id, :asc]])
+    #item = mongo[queue].find_and_modify(:query => query, :remove => true, :sort => [[:_id, :asc]])
+    item = mongo[queue].find_one_and_delete(query, sort: {_id: 1})
   rescue Mongo::Error::OperationFailure => e
     return nil if e.message =~ /No matching object/
     raise e
