@@ -42,7 +42,7 @@ module Resque
       def self.remove(index)
         item = all(index)
         #Resque.mongo_failures.remove(:_id => item['_id'])
-        Resque.mongo_failures.delete_one(:_id => item['_id'])
+        Resque.mongo_failures.delete_many(:_id => item['_id'])
       end
     end
   end

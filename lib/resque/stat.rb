@@ -52,7 +52,7 @@ module Resque
     # Removes a stat from Redis, effectively setting it to 0.
     def clear(stat)
       #mongo_stats.remove({:stat => stat})
-      mongo_stats.delete_one({:stat => stat})
+      mongo_stats.delete_many({:stat => stat})
     end
   end
 end

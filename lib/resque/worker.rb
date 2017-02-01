@@ -361,7 +361,7 @@ module Resque
       end
 
       #mongo_workers.remove :worker => self.to_s
-      mongo_workers.delete_one :worker => self.to_s
+      mongo_workers.delete_many :worker => self.to_s
 
       Stat.clear("processed:#{self}")
       Stat.clear("failed:#{self}")
@@ -382,7 +382,7 @@ module Resque
     def done_working
       processed!
       #mongo_workers.remove({ :worker => self.to_s})
-      mongo_workers.delete_one({ :worker => self.to_s})
+      mongo_workers.delete_many({ :worker => self.to_s})
     end
 
     # How many jobs has this worker processed? Returns an int.
