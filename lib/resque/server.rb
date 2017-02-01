@@ -110,7 +110,7 @@ module Resque
       response["Cache-Control"] = "max-age=0, private, must-revalidate"
       begin
         erb page.to_sym, {:layout => layout}, :resque => Resque
-      rescue Mongo::ConnectionError, Mongo::ConnectionFailure
+      rescue Mongo::Error::NoServerAvailable #Mongo::ConnectionError, Mongo::ConnectionFailure
         erb :error, {:layout => false}, :error => "Can't connect to MongoDB!"
       end
     end

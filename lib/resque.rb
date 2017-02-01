@@ -20,26 +20,29 @@ module Resque
   
   # Set the queue database. Expects a Mongo::DB object.
   def mongo=(database)
-    if database.is_a?(Mongo::DB)
+    if database.is_a?(Mongo::Database)
       @mongo = database
       initialize_mongo
     else
-      raise ArgumentError, "Resque.mongo= expects a Mongo::DB database, not a #{database.class}."
+      raise ArgumentError, "Resque.mongo= expects a Mongo::Database database, not a #{database.class}."
     end
   end
 
   # Returns the current Mongo::DB. If none has been created, it will
   # create a new one called 'resque'.
   def mongo
-    return @mongo if @mongo
-    self.mongo = Mongo::Connection.new.db("resque")
+    #return @mongo if @mongo
+    #self.mongo = Mongo::Connection.new.db("resque")
     @mongo
   end
 
   def initialize_mongo
-    mongo_workers.create_index :worker
-    mongo_stats.create_index :stat
-    delayed_queues = mongo_stats.find_one(:stat => 'Delayed Queues')
+    #mongo_workers.create_index :worker
+    #mongo_stats.create_index :stat
+    mongo_workers.indexes.create_one worker: 1
+    mongo_stats.indexes.create_one stat: 1
+    #delayed_queues = mongo_stats.find_one(:stat => 'Delayed Queues')
+    delayed_queues = mongo_stats.find(:stat => 'Delayed Queues').limit(1).first
     @delayed_queues = delayed_queues['value'] if delayed_queues
   end
 
@@ -103,7 +106,8 @@ module Resque
   end
 
   def to_s
-    connection_info = mongo.connection.primary_pool
+    #connection_info = mongo.connection.primary_pool
+    connection_info = mongo.client.cluster.addresses.first
     "Resque Client connected to #{connection_info.host}:#{connection_info.port}/#{mongo.name}"
   end
 
@@ -120,7 +124,8 @@ module Resque
     queue = namespace_queue(queue)
     unless delayed_queue? queue
       @delayed_queues << queue
-      mongo_stats.update({:stat => 'Delayed Queues'}, {'$addToSet' => {'value' => queue}}, {:upsert => true})
+      #mongo_stats.update({:stat => 'Delayed Queues'}, {'$addToSet' => {'value' => queue}}, {:upsert => true})
+      mongo_stats.update_one({:stat => 'Delayed Queues'}, {'$addToSet' => {'value' => queue}}, {:upsert => true})
     end
   end
   

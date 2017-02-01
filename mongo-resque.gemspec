@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
     without the work of defunkt and ctrochalakis on github.
 description
 
-  s.add_dependency "mongo",      "~> 1.5"
+  s.add_dependency "mongo"
   s.add_dependency "vegas",      "~> 0.1.2"
   s.add_dependency "sinatra",    ">= 0.9.2"
   s.add_dependency "multi_json", "~> 1.0"

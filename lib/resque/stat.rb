@@ -11,7 +11,8 @@ module Resque
 
     # Returns the int value of a stat, given a string stat name.
     def get(stat)
-      value = mongo_stats.find_one :stat => stat
+      #value = mongo_stats.find_one :stat => stat
+      value = mongo_stats.find(:stat => stat).limit(1).first
       value.nil? ? 0 : value['value']
     end
 
@@ -25,7 +26,8 @@ module Resque
     # Can optionally accept a second int parameter. The stat is then
     # incremented by that amount.
     def incr(stat, by = 1)
-      mongo_stats.update({:stat => stat}, {'$inc' => {:value => by}}, :upsert => true)
+      #mongo_stats.update({:stat => stat}, {'$inc' => {:value => by}}, :upsert => true)
+      mongo_stats.update_one({:stat => stat}, {'$inc' => {:value => by}}, :upsert => true)
     end
 
     # Increments a stat by one.
@@ -38,7 +40,8 @@ module Resque
     # Can optionally accept a second int parameter. The stat is then
     # decremented by that amount.
     def decr(stat, by = 1)
-      mongo_stats.update({ :stat => stat}, { '$inc' => { :value => -by}})
+      #mongo_stats.update({ :stat => stat}, { '$inc' => { :value => -by}})
+      mongo_stats.update_one({ :stat => stat}, { '$inc' => { :value => -by}})
     end
 
     # Decrements a stat by one.
@@ -48,7 +51,8 @@ module Resque
 
     # Removes a stat from Redis, effectively setting it to 0.
     def clear(stat)
-      mongo_stats.remove({:stat => stat})
+      #mongo_stats.remove({:stat => stat})
+      mongo_stats.delete_one({:stat => stat})
     end
   end
 end

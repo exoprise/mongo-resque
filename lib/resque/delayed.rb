@@ -24,7 +24,8 @@ module Resque
     end
 
     def initialize_delayed
-      delayed_queues = mongo_stats.find_one(:stat => 'Delayed Queues')
+      #delayed_queues = mongo_stats.find_one(:stat => 'Delayed Queues')
+      delayed_queues = mongo_stats.find(:stat => 'Delayed Queues').limit(1).first
       @delayed_queues = delayed_queues['value'] if delayed_queues
     end
 
@@ -41,7 +42,8 @@ module Resque
       queue = namespace_queue(queue)
       unless delayed_queue? queue
         @delayed_queues << queue
-        mongo_stats.update({:stat => 'Delayed Queues'}, {'$addToSet' => {'value' => queue}}, {:upsert => true})
+        #mongo_stats.update({:stat => 'Delayed Queues'}, {'$addToSet' => {'value' => queue}}, {:upsert => true})
+        mongo_stats.update_one({:stat => 'Delayed Queues'}, {'$addToSet' => {'value' => queue}}, {:upsert => true})
       end
     end
 

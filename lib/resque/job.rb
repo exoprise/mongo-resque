@@ -97,7 +97,8 @@ module Resque
       selector = {'class' => klass.to_s}
       selector['args'] = args unless args.empty?
       destroyed = collection.find(selector).count
-      collection.remove(selector, :safe => true)
+      #collection.remove(selector, :safe => true)
+      collection.delete_many(selector)
       destroyed
     end
 

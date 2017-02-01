@@ -26,19 +26,22 @@ module Resque
       end
 
       def self.clear
-        Resque.mongo_failures.remove
+        #Resque.mongo_failures.remove
+        Resque.mongo_failures.delete_many
       end
 
       def self.requeue(index)
         item = all(index)
         item['retried_at'] = Time.now.strftime("%Y/%m/%d %H:%M:%S")
-        Resque.mongo_failures.update({ :_id => item['_id']}, item)
+        #Resque.mongo_failures.update({ :_id => item['_id']}, item)
+        Resque.mongo_failures.update_one({ :_id => item['_id']}, item)
         Job.create(item['queue'], item['payload']['class'], *item['payload']['args'])
       end
 
       def self.remove(index)
         item = all(index)
-        Resque.mongo_failures.remove(:_id => item['_id'])
+        #Resque.mongo_failures.remove(:_id => item['_id'])
+        Resque.mongo_failures.delete_one(:_id => item['_id'])
       end
     end
   end
