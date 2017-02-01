@@ -13,7 +13,8 @@ module Resque
           :worker    => worker.to_s,
           :queue     => queue
         }
-        Resque.mongo_failures << data
+        #Resque.mongo_failures << data
+        Resque.mongo_failures.insert_one(data)
       end
 
       def self.count

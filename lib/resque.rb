@@ -163,7 +163,8 @@ module Resque
   def push(queue, item)
     queue = namespace_queue(queue)
     item[:resque_enqueue_timestamp] = Time.now
-    mongo[queue] << item
+    #mongo[queue] << item
+    mongo[queue].insert_one(item)
   end
 
   # Pops a job off a queue. Queue name should be a string.

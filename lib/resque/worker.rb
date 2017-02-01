@@ -333,7 +333,8 @@ module Resque
     # Registers ourself as a worker. Useful when entering the worker
     # lifecycle on startup.
     def register_worker
-      mongo_workers << { :worker => self.to_s}
+      #mongo_workers << { :worker => self.to_s}
+      mongo_workers.insert_one({:worker => self.to_s})
       started!
     end
 
