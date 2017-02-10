@@ -38,7 +38,7 @@
 
   <h1>Mongo Database Health</h1>
   <table class='stats'>
-  <% resque.mongo.stats.each_pair do |key, value| %>
+  <% Mongo::Operation::Result.new(resque.mongo.command({dbstats: 1}).replies).validate!.first.each_pair do |key, value| %>
     <tr>
       <th>
         <%= key %>
