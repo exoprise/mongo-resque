@@ -118,6 +118,7 @@ module Resque
           if @child = fork
             srand # Reseeding
             procline "Forked #{@child} at #{Time.now.to_i}"
+            run_hook :after_fork_parent, job
             Process.wait(@child)
           else
             procline "Processing #{job.queue} since #{Time.now.to_i}"
