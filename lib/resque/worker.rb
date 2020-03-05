@@ -109,8 +109,11 @@ module Resque
         if not paused? and job = reserve
           log "got: #{job.inspect}"
           job.worker = self
-          run_hook :before_fork, job
           working_on job
+
+          # before_fork must be run after any mongo calls (e.g. working_on above)
+          # so the client can be closed
+          run_hook :before_fork, job
 
           if @child = fork
             srand # Reseeding
