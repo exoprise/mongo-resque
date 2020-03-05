@@ -105,6 +105,15 @@ module Resque
     @after_fork = after_fork
   end
 
+  def after_fork_parent(&block)
+    block ? (@after_fork_parent = block) : @after_fork_parent
+  end
+
+  # Set the after_fork proc.
+  def after_fork_parent=(after_fork_parent)
+    @after_fork_parent = after_fork_parent
+  end
+
   def to_s
     #connection_info = mongo.connection.primary_pool
     connection_info = mongo.client.cluster.addresses.first
