@@ -109,7 +109,9 @@ module Resque
         if not paused? and job = reserve
           log "got: #{job.inspect}"
           job.worker = self
-          working_on job
+          
+          # moving this to perform to accommodate jobs_per_fork
+          #working_on job
 
           # before_fork must be run after any mongo calls (e.g. working_on above)
           # so the client can be closed
@@ -153,9 +155,13 @@ module Resque
     end
 
     # Processes a given job in the child.
-    def perform(job)
+    def perform(job, job_count = 1)
       begin
         run_hook :after_fork, job
+
+        # moved from #work to accommodate jobs_per_fork
+        working_on job, job_count
+        
         job.perform
       rescue Object => e
         log "#{job.inspect} failed: #{e.inspect}"
@@ -166,6 +172,10 @@ module Resque
         end
         failed!
       else
+  
+        # moved from #done_working to accommodate jobs_per_fork
+        processed!
+        
         log "done: #{job.inspect}"
       ensure
         yield job if block_given?
@@ -373,10 +383,11 @@ module Resque
 
     # Given a job, tells Mongo we're working on it. Useful for seeing
     # what workers are doing and when.
-    def working_on(job)
+    def working_on(job, job_count = 1)
       data = { :queue   => job.queue,
                :run_at  => Time.now.strftime("%Y/%m/%d %H:%M:%S %Z"),
-               :payload => job.payload }
+               :payload => job.payload,
+               :job_count => job_count, }
       #mongo_workers.update({:worker => self.to_s}, { '$set' => { 'working_on' => data}}, :upsert => true)
       mongo_workers.update_one({:worker => self.to_s}, { '$set' => { 'working_on' => data}}, :upsert => true)
     end
@@ -384,7 +395,10 @@ module Resque
     # Called when we are done working - clears our `working_on` state
     # and tells Mongo we processed a job.
     def done_working
-      processed!
+      
+      # moving to #perform to correct the stats for jobs_per_fork
+      #processed!
+      
       #mongo_workers.remove({ :worker => self.to_s})
       mongo_workers.delete_many({ :worker => self.to_s})
     end
