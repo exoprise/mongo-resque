@@ -123,7 +123,8 @@ module Resque
             run_hook :after_fork_parent, job
             Process.wait(@child)
           else
-            procline "Processing #{job.queue} since #{Time.now.to_i}"
+            @fork_at = Time.now
+            procline "Processing #{job.queue} since #{@fork_at.to_i}"
             perform(job, &block)
             exit! unless @cant_fork
           end
@@ -385,6 +386,7 @@ module Resque
     # what workers are doing and when.
     def working_on(job, job_count = 1)
       data = { :queue   => job.queue,
+               :fork_at => @fork_at.strftime("%Y/%m/%d %H:%M:%S %Z"),
                :run_at  => Time.now.strftime("%Y/%m/%d %H:%M:%S %Z"),
                :payload => job.payload,
                :job_count => job_count, }

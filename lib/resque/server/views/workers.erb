@@ -28,7 +28,7 @@
         <% data = worker.processing || {} %>
         <% if data['queue'] %>
           <code><%= data['payload']['class'] %></code>
-          <small><a class="queue time" href="<%=u "/working/#{worker}" %>"><%= data['run_at'] %></a> <%= data['job_count'] %></small>
+          <small><a class="queue time" href="<%=u "/working/#{worker}" %>"><%= data['fork_at'] %> <%= data['run_at'] %></a> <%= data['job_count'] %></small>
         <% else %>
           <span class='waiting'>Waiting for a job...</span>
         <% end %>
@@ -69,7 +69,7 @@
         <% data = worker.processing || {} %>
         <% if data['queue'] %>
           <code><%= data['payload']['class'] %></code>
-          <small><a class="queue time" href="<%=u "/working/#{worker}" %>"><%= data['run_at'] %></a> <%= data['job_count'] %></small>
+          <small><a class="queue time" href="<%=u "/working/#{worker}" %>"><%= data['fork_at'] %> <%= data['run_at'] %></a> <%= data['job_count'] %></small>
         <% else %>
           <span class='waiting'>Waiting for a job...</span>
         <% end %>
