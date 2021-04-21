@@ -278,6 +278,7 @@ module Resque
     def shutdown
       log 'Exiting...'
       @shutdown = true
+      shutdown_child if @child
     end
 
     # Kill the child and shutdown immediately.
@@ -302,6 +303,18 @@ module Resque
           log! "Child #{@child} not found, restarting."
           shutdown
         end
+      end
+    end
+    
+    # soft like #shutdown
+    def shutdown_child
+      return unless @child
+      
+      log "signaling child to shutdown at #{@child}"
+      if system("ps -o pid,state -p #{@child}")
+        Process.kill("QUIT", @child) rescue nil
+      else
+        log "Child #{@child} not found"
       end
     end
 
