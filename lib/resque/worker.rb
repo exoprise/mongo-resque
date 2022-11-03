@@ -125,6 +125,11 @@ module Resque
           else
             @fork_at = Time.now
             @is_child = true
+
+            # this used to be in #perform which meant that in the presence of
+            # jobs_per_fork it would be invoked per job not per fork
+            run_hook :after_fork, job
+            
             procline "Processing #{job.queue} since #{@fork_at.to_i}"
             perform(job, &block)
             exit! unless @cant_fork
@@ -159,7 +164,10 @@ module Resque
     # Processes a given job in the child.
     def perform(job, job_count = 1)
       begin
-        run_hook :after_fork, job
+        
+        # in the presence of jobs_per_fork this would run per job not per fork
+        # so moving it to #work
+        #run_hook :after_fork, job
 
         # moved from #work to accommodate jobs_per_fork
         working_on job, job_count
