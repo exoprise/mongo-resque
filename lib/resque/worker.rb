@@ -68,7 +68,11 @@ module Resque
     # in alphabetical order. Queues can be dynamically added or
     # removed without needing to restart workers using this method.
     def initialize(*queues)
-      @queues = queues.map { |queue| queue.to_s.strip }
+      #@queues = queues.map { |queue| queue.to_s.strip }
+      @queue_excl, @queues = queues
+                               .map{|queue| queue.to_s.strip}
+                               .partition{|q| q.start_with?('-')}
+      @queue_excl.map!{|q| q[1..]}
       validate_queues
     end
 
@@ -140,7 +144,7 @@ module Resque
         else
           break if interval.zero?
           log! "Sleeping for #{interval} seconds"
-          procline paused? ? "Paused" : "Waiting for #{@queues.join(',')}"
+          procline paused? ? "Paused" : "Waiting for #{id_queue_spec}"
           sleep interval
         end
       end
@@ -214,7 +218,11 @@ module Resque
     # A splat ("*") means you want every queue (in alpha order) - this
     # can be useful for dynamically adding new queues.
     def queues
-      @queues.map {|queue| queue == "*" ? Resque.queues.sort : queue }.flatten.uniq
+      @queues.map {|queue| queue == "*" ? Resque.queues.sort : queue }.flatten.uniq - @queue_excl
+    end
+
+    def queue_excl_display
+      @queue_excl.map{|q| '-' + q}
     end
 
     # Not every platform supports fork. Here we do our magic to
@@ -496,10 +504,14 @@ module Resque
       "#<Worker #{to_s}>"
     end
 
+    def id_queue_spec
+      (@queues + queue_excl_display).join(',')
+    end
+
     # The string representation is the same as the id for this worker
     # instance. Can be used with `Worker.find`.
     def to_s
-      @to_s ||= "#{hostname}:#{Process.pid}:#{@queues.join(',')}"
+      @to_s ||= "#{hostname}:#{Process.pid}:#{id_queue_spec}"
     end
     alias_method :id, :to_s
 
